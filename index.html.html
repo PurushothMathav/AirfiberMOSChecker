@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airfiber Feasibility Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #f5f7fa, #e2e8f0);
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            font-size: 2.5rem;
+            color: #2c5282;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            background: linear-gradient(to right, #3182ce, #4299e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding: 10px;
+        }
+        
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            color: #2b6cb0;
+            margin-bottom: 15px;
+        }
+        
+        .input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid #4299e1;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+        
+        input {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #3182ce, #4299e1);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .result {
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            max-width: 600px;
+        }
+        
+        .feasible {
+            background: linear-gradient(to right, #c6f6d5, #9ae6b4);
+            color: #22543d;
+        }
+        
+        .not-feasible {
+            background: linear-gradient(to right, #fed7d7, #feb2b2);
+            color: #742a2a;
+        }
+        
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 15px;
+            margin: 20px auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid white;
+            max-width: 800px;
+        }
+        
+        .distance-info {
+            margin: 5px auto 20px;
+            font-size: 1.1rem;
+            text-align: center;
+            font-weight: 500;
+            color: #4a5568;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+        }
+        
+        .examples {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .example-btn {
+            background: linear-gradient(to right, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .example-btn:hover {
+            background: linear-gradient(to right, #4f46e5, #4338ca);
+            transform: translateY(-1px);
+        }
+        
+        .app-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .app-title span {
+            font-size: 2.5rem;
+            color: #4299e1;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .input-field {
+                min-width: 100%;
+            }
+            
+            #map {
+                height: 300px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .result {
+                font-size: 1rem;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Airfiber MOH Checker</h1>
+        <div class="input-section">
+            <h2>Enter Coordinates</h2>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="lat1">Latitude 1</label>
+                    <input type="number" id="lat1" step="any" placeholder="e.g. 13.0474">
+                </div>
+                <div class="input-field">
+                    <label for="lon1">Longitude 1</label>
+                    <input type="number" id="lon1" step="any" placeholder="e.g. 80.2482">
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="lat2">Latitude 2</label>
+                    <input type="number" id="lat2" step="any" placeholder="e.g. 13.0569">
+                </div>
+                <div class="input-field">
+                    <label for="lon2">Longitude 2</label>
+                    <input type="number" id="lon2" step="any" placeholder="e.g. 80.2425">
+                </div>
+            </div>
+            <div class="button-group">
+                <button onclick="checkFeasibility()">Check Feasibility</button>
+                <div class="examples">
+                    <button class="example-btn" onclick="loadChennaiExample()">Chennai Example</button>
+                    <button class="example-btn" onclick="loadWestMambalamExample()">West Mambalam Example</button>
+                </div>
+            </div>
+        </div>
+        <div id="result" style="display: none"></div>
+        <div id="map"></div>
+        <div id="distance-info" class="distance-info"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        // Initialize the map with a more detailed layer - centered on Chennai
+        let map = L.map('map').setView([13.0827, 80.2707], 12); // Chennai coordinates
+        
+        // Using Esri World Street Map for more detailed street names
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri'
+        }).addTo(map);
+        
+        // Variables to store map objects
+        let marker1, marker2, circle1, circle2, line, distanceMarker;
+        
+        // Calculate distance between two points using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+        
+        // Load Chennai example
+        function loadChennaiExample() {
+            document.getElementById("lat1").value = 13.0474;
+            document.getElementById("lon1").value = 80.2482;
+            document.getElementById("lat2").value = 13.0201;
+            document.getElementById("lon2").value = 80.2217;
+            checkFeasibility();
+        }
+        
+        // Load West Mambalam example (locations similar to your image)
+        function loadWestMambalamExample() {
+            document.getElementById("lat1").value = 13.0401;
+            document.getElementById("lon1").value = 80.2187;  // West Mambalam
+            document.getElementById("lat2").value = 13.0290; 
+            document.getElementById("lon2").value = 80.2570;  // A location ~4km away
+            checkFeasibility();
+        }
+        
+        function checkFeasibility() {
+            const lat1 = parseFloat(document.getElementById("lat1").value);
+            const lon1 = parseFloat(document.getElementById("lon1").value);
+            const lat2 = parseFloat(document.getElementById("lat2").value);
+            const lon2 = parseFloat(document.getElementById("lon2").value);
+
+            // Validate inputs
+            if (isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
+                alert("Please enter valid coordinates.");
+                return;
+            }
+
+            // Calculate distance
+            const distance = calculateDistance(lat1, lon1, lat2, lon2);
+            const isFeasible = distance <= 1;
+
+            // Display result
+            const resultElement = document.getElementById("result");
+            resultElement.style.display = "block";
+            resultElement.className = isFeasible ? "result feasible" : "result not-feasible";
+            resultElement.textContent = isFeasible ? "Airfiber Feasible (Distance < 1km)" : "Airfiber MOH Not Feasible (Distance > 1km)";
+
+            // Show distance information
+            document.getElementById("distance-info").textContent = `Distance between locations: ${distance.toFixed(3)} km`;
+
+            // Update map
+            updateMap(lat1, lon1, lat2, lon2, distance);
+        }
+
+        function updateMap(lat1, lon1, lat2, lon2, distance) {
+            // Clear existing markers and shapes
+            if (marker1) map.removeLayer(marker1);
+            if (marker2) map.removeLayer(marker2);
+            if (circle1) map.removeLayer(circle1);
+            if (circle2) map.removeLayer(circle2);
+            if (line) map.removeLayer(line);
+            if (distanceMarker) map.removeLayer(distanceMarker);
+            
+            const point1 = [lat1, lon1];
+            const point2 = [lat2, lon2];
+            
+            // Create custom markers
+            const redIcon = L.divIcon({
+                html: `<div style="background-color: #f56565; width: 30px; height: 30px; border-radius: 15px; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">1</div>`,
+                className: '',
+                iconSize: [30, 30]
+            });
+            
+            const blueIcon = L.divIcon({
+                html: `<div style="background-color: #4299e1; width: 30px; height: 30px; border-radius: 15px; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">2</div>`,
+                className: '',
+                iconSize: [30, 30]
+            });
+            
+            marker1 = L.marker(point1, {icon: redIcon}).addTo(map)
+                .bindPopup(`<b>Coordinate 1</b><br>Lat: ${lat1}<br>Lon: ${lon1}`);
+                
+            marker2 = L.marker(point2, {icon: blueIcon}).addTo(map)
+                .bindPopup(`<b>Coordinate 2</b><br>Lat: ${lat2}<br>Lon: ${lon2}<br>Distance: ${distance.toFixed(3)} km`);
+            
+            // Create circles - 1km radius around point1 and point2
+            circle1 = L.circle(point1, {
+                color: '#f56565',
+                fillColor: '#fc8181',
+                fillOpacity: 0.2,
+                radius: 1000 // 1km in meters
+            }).addTo(map);
+            
+            circle2 = L.circle(point2, {
+                color: '#4299e1',
+                fillColor: '#63b3ed',
+                fillOpacity: 0.2,
+                radius: 1000 // 1km in meters
+            }).addTo(map);
+            
+            // Add line connecting points
+            line = L.polyline([point1, point2], {
+                color: '#805ad5',
+                weight: 4,
+                opacity: 0.7,
+                dashArray: '10, 10'
+            }).addTo(map);
+            
+            // Add distance label at middle of line with better visibility
+            const midPoint = [(lat1 + lat2) / 2, (lon1 + lon2) / 2];
+            distanceMarker = L.marker(midPoint, {
+                icon: L.divIcon({
+                    html: `<div style="background-color: white; padding: 5px 10px; border-radius: 6px; border: 2px solid #805ad5; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">${distance.toFixed(3)} km</div>`,
+                    className: '',
+                    iconSize: [80, 20],
+                    iconAnchor: [40, 10]
+                })
+            }).addTo(map);
+            
+            // Fit map to show both points and their circles
+            const bounds = L.latLngBounds(point1, point2).pad(0.5);
+            map.fitBounds(bounds);
+        }
+        
+        // Removed the automatic loading of example data
+    </script>
+</body>
+</html>
