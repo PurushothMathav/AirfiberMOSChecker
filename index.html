@@ -253,7 +253,7 @@
                 </div>
             </div>
             <div class="button-group">
-                <button onclick="checkFeasibility()">Check Feasibility</button>
+                <button onclick="checkFeasibility()">Check MOS</button>
                 <div class="examples">
                     <button class="example-btn" onclick="loadChennaiExample()">Chennai Example</button>
                     <button class="example-btn" onclick="loadWestMambalamExample()">West Mambalam Example</button>
@@ -334,7 +334,7 @@
             const resultElement = document.getElementById("result");
             resultElement.style.display = "block";
             resultElement.className = isFeasible ? "result feasible" : "result not-feasible";
-            resultElement.textContent = isFeasible ? "Airfiber Feasible (Distance < 1km)" : "Airfiber MOS Not Feasible (Distance > 1km)";
+            resultElement.textContent = isFeasible ? "Airfiber Feasible (Distance < 1km)" : "Mark Onsite Not Feasible (Distance > 1km)";
 
             // Show distance information
             document.getElementById("distance-info").textContent = `Distance between locations: ${distance.toFixed(3)} km`;
