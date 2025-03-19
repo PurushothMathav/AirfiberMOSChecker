@@ -257,6 +257,7 @@
                 <div class="examples">
                     <button class="example-btn" onclick="loadVadapalaniExample()">Vadapalani</button>
                     <button class="example-btn" onclick="loadWestMambalamExample()">West Mambalam</button>
+					<button class="reset-btn" onclick="resetValues()">Reset</button>
                 </div>
             </div>
         </div>
@@ -313,8 +314,8 @@
             document.getElementById("lon2").value = 80.22093440838833;  // A location ~4km away
             checkFeasibility();
         }
-        
-        function resetValues() {
+		
+		function resetValues() {
 		// Clear all input fields individually to ensure they're all reset
 			document.getElementById("lat1").value = "";
 			document.getElementById("lon1").value = "";
