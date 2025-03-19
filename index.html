@@ -314,6 +314,40 @@
             checkFeasibility();
         }
         
+        function resetValues() {
+		// Clear all input fields individually to ensure they're all reset
+			document.getElementById("lat1").value = "";
+			document.getElementById("lon1").value = "";
+			document.getElementById("lat2").value = "";
+			document.getElementById("lon2").value = "";
+    
+		// Clear result message
+			const resultElement = document.getElementById("result");
+			resultElement.style.display = "none";
+    
+		// Clear distance info
+			document.getElementById("distance-info").textContent = "";
+    
+		// Clear map markers and shapes
+			if (marker1) map.removeLayer(marker1);
+			if (marker2) map.removeLayer(marker2);
+			if (circle1) map.removeLayer(circle1);
+			if (circle2) map.removeLayer(circle2);
+			if (line) map.removeLayer(line);
+			if (distanceMarker) map.removeLayer(distanceMarker);
+    
+		// Reset the map view to Chennai
+			map.setView([13.0827, 80.2707], 12);
+    
+		// Set all markers and shapes to null to ensure they're fully reset
+			marker1 = null;
+			marker2 = null;
+			circle1 = null;
+			circle2 = null;
+			line = null;
+			distanceMarker = null;
+		}
+        
         function checkFeasibility() {
             const lat1 = parseFloat(document.getElementById("lat1").value);
             const lon1 = parseFloat(document.getElementById("lon1").value);
